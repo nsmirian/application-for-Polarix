@@ -3,7 +3,7 @@
 % Najmeh mirian 29 Nov 2023
 
 function filename= Pulse_reconstruction(a)
-
+addpath('home/ttflinac/user/mirian/FL2_funs')
 % Bakg=load('background_img.mat');
 imag_lasing_on=load('imag_shots_lasing_on.mat');
 imag_lasing_off=load('imag_shots_lasing_off.mat');

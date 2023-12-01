@@ -10,7 +10,7 @@ load('/home/ttflinac/user/mflorian/PolariX/FL2/time_calibration/time_calib_9FL2X
 load('/home/ttflinac/user/mflorian/PolariX/FL2/energy_calibration/erg_calib_9FL2XTDS.mat', 'ergcal', 'ergcal_err')
 display('data is loaded');
 
-
+addpath='/System/Volumes/Data/home/ttflinac/user/mirian/FL2_funs'
 
 fontSize        = 14;
 calib_x             = timecal_fspixel;
@@ -20,7 +20,7 @@ timeres_calib       = time_res;
 
 
 
-img_sig    = imag_file.img(end:a, :, :);
+img_sig    = imag_file.img(1:a, :, :);
 
 num_sig     = size(img_sig, 3);
 length_y    = size(img_sig, 1);
@@ -47,7 +47,7 @@ for jj = 1:num_sig
     img_filt(:,:,jj)    = medfilt2(tmp_img);
 
     % time
-    tmp_profile         = mean(img_filt(:,:,jj));
+    tmp_profile         = mean(medfilt2(:,:,jj));
 
     [x_com(jj), x_var(jj), x_fwhm(jj), x_axis, x_profile(jj,:)]  = get_profile_stats(tmp_profile, calib_x);
 
@@ -72,12 +72,13 @@ for jj=1:num_sig
     for n=min(time_pos_good):max(time_pos_good)
 
 
-        [baseline, height,sigma, mu]=hlc_fit_gaussian(x, y);
-        if isnan(sigma)
+        Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
+        %Ans=[baseline, height,mu, sigma]
+        if isnan(Ans(3))
         else
 
-            slice_enrgy_spread(jj, n)=sigma*calib_y;
-            cent_energy_cr(jj, n)=mu*calib_y;
+            slice_enrgy_spread(jj, n)=Ans(4)*calib_y;
+            cent_energy_cr(jj, n)=Ans(3)*calib_y;
         end
 
     end
