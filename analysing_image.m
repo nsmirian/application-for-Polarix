@@ -10,7 +10,7 @@ load('/home/ttflinac/user/mflorian/PolariX/FL2/time_calibration/time_calib_9FL2X
 load('/home/ttflinac/user/mflorian/PolariX/FL2/energy_calibration/erg_calib_9FL2XTDS.mat', 'ergcal', 'ergcal_err')
 display('data is loaded');
 
-addpath='/System/Volumes/Data/home/ttflinac/user/mirian/FL2_funs'
+addpath('/System/Volumes/Data/home/ttflinac/user/mirian/FL2_funs')
 
 fontSize        = 14;
 calib_x             = timecal_fspixel;
@@ -18,9 +18,13 @@ calib_y             = ergcal;
 timeres_calib       = time_res;
 
 
+if a <600
 
+img_sig    = imag_file.img(1:end, :, :);
 
-img_sig    = imag_file.img(1:a, :, :);
+else 
+    img_sig    = imag_file.img(1:a, :, :);
+end 
 
 num_sig     = size(img_sig, 3);
 length_y    = size(img_sig, 1);
@@ -44,10 +48,10 @@ for jj = 1:num_sig
 
     tmp_img             = hlc_clean_image( squeeze(img_sig(:,:,jj)) );
 
-    img_filt(:,:,jj)    = medfilt2(tmp_img);
+    img_filt(:,:,jj)    = tmp_img;
 
     % time
-    tmp_profile         = mean(medfilt2(:,:,jj));
+    tmp_profile         = mean(img_filt(:,:,jj));
 
     [x_com(jj), x_var(jj), x_fwhm(jj), x_axis, x_profile(jj,:)]  = get_profile_stats(tmp_profile, calib_x);
 
