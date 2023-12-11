@@ -103,13 +103,14 @@ for on_off=0:3:3
 
           %  mu0=  find( img_filt(erg_pos_good,n,jj)==max(img_filt(erg_pos_good,n,jj)));
           %  [sigma, mu] = gaussfit( erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) , 0, erg_pos_good(mu0(1)));
-          [baseline, height,sigma, mu]=hlc_fit_gaussian(x, y);
-          if isnan(sigma)
-            else
+          Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
+        %Ans=[baseline, height,mu, sigma]
+        if isnan(Ans(3))
+        else
 
-                slice_enrgy_spread(jj, n)=sigma*calib_y;
-                cent_energy_cr(jj, n)=mu*calib_y;
-            end
+            slice_enrgy_spread(jj, n)=Ans(4)*calib_y;
+            cent_energy_cr(jj, n)=Ans(3)*calib_y;
+        end
 
         end
     end
