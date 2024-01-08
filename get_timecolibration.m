@@ -128,7 +128,7 @@ for jj = 1:num_bgr
         while bgr_x(jj,:) == bgr_x(jj-1,:)
             ddd_read        = doocsread([addr_cam, 'SPECTRUM.X.TD']);
             bgr_x(jj,:)     = ddd_read.data.d_gspect_array_val;
-            display_message(msgLoc, [' - (', num2str(jj), ') same data ... wait ...']);  
+            display( [' - (', num2str(jj), ') same data ... wait ...']);  
             pause(10/rep_rate)
         end
     end
@@ -142,7 +142,7 @@ for jj = 1:num_bgr
         while bgr_y(jj,:) == bgr_y(jj-1,:)
             ddd_read        = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
             bgr_y(jj,:)     = ddd_read.data.d_gspect_array_val;
-            display_message(msgLoc, [' - (', num2str(jj), ') same data ... wait ...']);  
+            display([' - (', num2str(jj), ') same data ... wait ...']);  
             pause(10/rep_rate)
         end
     end    
@@ -222,9 +222,9 @@ for ii = 1:num_actuator % scan points
         raw_spec_y(ii,jj,:)     = ddd_read.data.d_gspect_array_val;
 
         % remove bg y
-      %  tmp                     = squeeze(raw_spec_y(ii,jj,:));
-      %  corr_spec_y(ii,jj,:)    = tmp' - bgr_spec_y_mean;
-         corr_spec_y(ii,jj,:)    = hlc_clean_line( squeeze(raw_spec_y(ii,jj,:)) )
+       tmp                     = squeeze(raw_spec_y(ii,jj,:));
+        corr_spec_y(ii,jj,:)    = tmp' - bgr_spec_y_mean;
+     %    corr_spec_y(ii,jj,:)    = hlc_clean_line( squeeze(raw_spec_y(ii,jj,:)) )
 
         % filter (mean), fit (asymmetric gauss) and position (from fit)
         tmp                     = medfilt1(corr_spec_y(ii,jj,:), 3);
