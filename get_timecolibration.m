@@ -126,7 +126,7 @@ for jj = 1:num_bgr
     datatimestamp(jj)         = ddd_read.timespamp;
     % compared it with last measurement
     if jj > 1
-        while datatimestamp(jj) == datatimestamp(jj-1,:)
+        while datatimestamp(jj) == datatimestamp(jj-1)
             ddd_read        = doocsread([addr_cam, 'SPECTRUM.X.TD']);
             bgr_x(jj,:)     = ddd_read.data.d_gspect_array_val;
 
@@ -141,7 +141,7 @@ for jj = 1:num_bgr
     datatimestamp2(jj)         = ddd_read.timespamp;
     % compared it with last measurement
     if jj > 1
-        while datatimestamp2(jj) == datatimestamp2(jj-1,:)
+        while datatimestamp2(jj) == datatimestamp2(jj-1)
             ddd_read        = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
             bgr_y(jj,:)     = ddd_read.data.d_gspect_array_val;
             display([' - (', num2str(jj), ') same data ... wait ...']);
@@ -201,7 +201,7 @@ for ii = 1:num_actuator % scan points
         datatimestamp(jj)         = ddd_read.timespamp;
         % compared it with last measurement
         if jj > 1
-            while datatimestamp(jj) == datatimestamp(jj-1,:)
+            while datatimestamp(jj) == datatimestamp(jj-1)
 
                 ddd_read            = doocsread([addr_cam, 'SPECTRUM.X.TD']);
                 raw_spec_x(ii,jj,:) = ddd_read.data.d_gspect_array_val;
@@ -228,7 +228,7 @@ for ii = 1:num_actuator % scan points
         datatimestamp2(jj)         = ddd_read.timespamp;
         % compared it with last measurement
         if jj > 1
-            while datatimestamp2(jj) == datatimestamp2(jj-1,:)
+            while datatimestamp2(jj) == datatimestamp2(jj-1)
 
                 ddd_read            = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
                 raw_spec_y(ii,jj,:) = ddd_read.data.d_gspect_array_val;
