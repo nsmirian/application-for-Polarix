@@ -9,13 +9,13 @@
 
 function get_energycalibration_cycling(start_actuator, end_actuator,  num_sig)
 %% config
-
+close all
 
 % D4FL2XTDS current range
 %     start_actuator  = 117; % in A
 %     end_actuator    = 121; % in A
 
-%     num_actuator    = 5;    % set points
+     num_actuator    = 5;    % set points
 %     num_bgr         = 10;    % number of single background images per set point
 %     num_sig         = 10;    % number of single measurement per set point
 
@@ -41,7 +41,7 @@ addr_actuator_rbv       = ['FLASH.MAGNETS/MAGNET.ML/', name_magnet, '/CURRENT.RB
 
 % time
 timestamp               = datestr(clock, 'yyyy-mm-ddTHHMMSS');
-
+num_bgr=10;
 
 %% path
 
@@ -53,20 +53,20 @@ load('myColorMap.mat') % cmap
 %% prepare camera
 
 % switch off ROIs
-if (flag_act)
+%if (flag_act)
     ddd_write = doocswrite([addr_cam, 'ROI_SPECTRUM.ON'], 0);
     ddd_write = doocswrite([addr_cam, 'ROI2_SPECTRUM.ON'], 0);
-end
+%end
 
 % switch off: BG subtraction
-if (flag_act)
+%if (flag_act)
     ddd_write = doocswrite([addr_cam, 'SUBSTR.ON'], 0);
-end
+%end
 
 % switch on spectrum
-if (flag_act)
+%if (flag_act)
     ddd_write = doocswrite([addr_cam, 'SPECTRUM.ON'], 1);
-end
+%end
 
 %% prepare data structure
 
@@ -144,8 +144,9 @@ for jj = 1:num_bgr
     % read x
     ddd_read            = doocsread([addr_cam, 'SPECTRUM.X.TD']);
     bgr_x(jj,:)         = ddd_read.data.d_gspect_array_val;
+    ddd_read            = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
     bgr_y(jj,:)         = ddd_read.data.d_gspect_array_val;
-    datatimestamp(jj)         = ddd_read.timespamp;
+    datatimestamp(jj)         = ddd_read.timestamp;
     % compared it with last measurement
     if jj > 1
         while datatimestamp(jj) == datatimestamp(jj-1)
@@ -160,7 +161,7 @@ for jj = 1:num_bgr
     % read y
     ddd_read            = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
 
-    datatimestamp2(jj)         = ddd_read.timespamp;
+    datatimestamp2(jj)         = ddd_read.timestamp;
     % compared it with last measurement
     if jj > 1
         while datatimestamp2(jj) == datatimestamp2(jj-1)
@@ -183,6 +184,12 @@ bgr_spec_y_mean = mean(bgr_y);
 ddd_read        = doocsread([addr_cam, 'IMAGE_EXT']);
 bgr_img         = ddd_read.data.val_val;
 
+%%
+ddd_write = doocswrite([addr_cam, 'TRIGGERDELAYABS'], 0.0);
+display(' - changed camera delay');
+pause(2)
+
+
 %% Cycling befor measerment
 
 ddd_write = doocswrite(addr_laser_block, 1);  % block laser first ,
@@ -190,16 +197,16 @@ ddd_write = doocswrite(addr_actuator_set,start_actuator);
 % now cycling
 addr_actuator_Cycling       = ['FLASH.MAGNETS/MAGNET.ML/', name_magnet, 'PS.CYCLE'];
 
-ddd_write = doocswrite(addr_actuator_Cycling ,1);
-
-% wait till cycling finish
-
-t=doocsread('TTF2.MAGNETS/QUAD/Q22FL2EXTR/PS.CLEAN');
-cleanV=t.data;
-while cleanV                                        %% we should aask about this part
-    display( [' Dipole is cycling, please wait']);
-    pause(5)
-end
+% ddd_write = doocswrite(addr_actuator_Cycling ,1);
+% 
+% % wait till cycling finish
+% 
+% t=doocsread('TTF2.MAGNETS/QUAD/Q22FL2EXTR/PS.CLEAN');
+% cleanV=t.data;
+% while cleanV                                        %% we should aask about this part
+%     display( [' Dipole is cycling, please wait']);
+%     pause(5)
+% end
 display( [' Dipole cycling finished ']);
 
 
@@ -237,7 +244,7 @@ for ii = 1:num_actuator % scan points
         %%% read spectrum x
         ddd_read                = doocsread([addr_cam, 'SPECTRUM.X.TD']);
         raw_spec_x(ii,jj,:)     = ddd_read.data.d_gspect_array_val;
-        datatimestamp(jj)       = ddd_read.timespamp;
+        datatimestamp(jj)       = ddd_read.timestamp;
     % compared it with last measurement
     if jj > 1
         while datatimestamp(jj) == datatimestamp(jj-1)
@@ -262,7 +269,7 @@ for ii = 1:num_actuator % scan points
         %%% read spectrum Y
         ddd_read                = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
         raw_spec_y(ii,jj,:)     = ddd_read.data.d_gspect_array_val;
-        datatimestamp2(jj)      = ddd_read.timespamp;
+        datatimestamp2(jj)      = ddd_read.timestamp;
     % compared it with last measurement
         if jj > 1
         while datatimestamp2(jj) == datatimestamp2(jj-1)
@@ -306,29 +313,29 @@ display( [name_script, '(): Scan ended.']);
 
 %%
 % restore actuator reference value
-if (flag_act)
+%if (flag_act)
     tmp = mean([start_actuator, end_actuator]);
     ddd_write = doocswrite(addr_actuator_set, tmp);
     display([name_script, '(): Set actuator ', name_magnet, ' to ' , num2str(tmp, '%5.3f')]);
-end
+%end
 
 % Cycling befor measerment
 
 ddd_write = doocswrite(addr_laser_block, 1);  % block laser first ,
 
 % now cycling
-addr_actuator_Cycling       = ['FLASH.MAGNETS/MAGNET.ML/', name_magnet, 'PS.CYCLE'];
-
-ddd_write = doocswrite(addr_actuator_Cycling ,1);
-
-% wait till cycling finish
-t=doocsread('TTF2.MAGNETS/QUAD/Q22FL2EXTR/PS.CLEAN');
-cleanV=t.data;
-while CleanV                                       %   we should aask about this part
-    display( [' Dipole is cycling, please wait']);
-    pause(5)
-end
-display( [' Dipole cycling finished ']);
+% addr_actuator_Cycling       = ['FLASH.MAGNETS/MAGNET.ML/', name_magnet, 'PS.CYCLE'];
+% 
+% ddd_write = doocswrite(addr_actuator_Cycling ,1);
+% 
+% % wait till cycling finish
+% t=doocsread('TTF2.MAGNETS/QUAD/Q22FL2EXTR/PS.CLEAN');
+% cleanV=t.data;
+% while CleanV                                       %   we should aask about this part
+%     display( [' Dipole is cycling, please wait']);
+%     pause(5)
+% end
+% display( [' Dipole cycling finished ']);
 
 %% clear stuff
 clear tmp tmp2 ddd_write ddd_read
@@ -390,14 +397,14 @@ legend([p1(1), p2], ...
 set(gca, 'FontSize', fontSize)
 
 % add elog printing button
-uicontrol('String', 'Print', 'Callback', @(btn,~)printButtonCallbackDFS(btn, 'FLF PolariX energy calibration', comment));
+uicontrol('String', 'Print', 'Callback', @(btn,~)printButtonCallbackDFS(btn, 'FLF PolariX energy calibration'));
 
 %% save
 
-if (flag_save)
+%if (flag_save)
     save(['/home/ttflinac/user/mflorian/PolariX/FL2/energy_calibration/', name_script(5:end), '_', timestamp, '.mat'])
     save('/home/ttflinac/user/mflorian/PolariX/FL2/energy_calibration/erg_calib_9FL2XTDS.mat', 'ergcal', 'ergcal_err', 'timestamp')
-end
+%end
 
 
 end

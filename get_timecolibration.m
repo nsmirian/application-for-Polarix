@@ -1,11 +1,11 @@
 %%%
 % befor running please change the hlc_clean_image  ---> hlc_clean_line?
-function get_timecalibration(start_actuator, end_actuator, num_sig, ylimit)
+function get_timecalibration(start_actuator, end_actuator, num_sig)
 
 comment         = 'FL2 PolariX';
 fontSize        = 14;
 num_actuator=6;
-
+num_bgr=10;
 %%
 
 % addresses
@@ -122,8 +122,9 @@ for jj = 1:num_bgr
     % read x
     ddd_read            = doocsread([addr_cam, 'SPECTRUM.X.TD']);
     bgr_x(jj,:)         = ddd_read.data.d_gspect_array_val;
+    ddd_read            = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
     bgr_y(jj,:)         = ddd_read.data.d_gspect_array_val;
-    datatimestamp(jj)         = ddd_read.timespamp;
+    datatimestamp(jj)         = ddd_read.timestamp;
     % compared it with last measurement
     if jj > 1
         while datatimestamp(jj) == datatimestamp(jj-1)
@@ -138,7 +139,7 @@ for jj = 1:num_bgr
     % read y
     ddd_read            = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
 
-    datatimestamp2(jj)         = ddd_read.timespamp;
+    datatimestamp2(jj)         = ddd_read.timestamp;
     % compared it with last measurement
     if jj > 1
         while datatimestamp2(jj) == datatimestamp2(jj-1)
@@ -168,7 +169,7 @@ display( ['(): Start scan ...']);
 
 % unblock laser
 
-ddd_write = doocswrite([addr_cam, 'TRIGGERDELAYABS'], delay.data);
+ddd_write = doocswrite([addr_cam, 'TRIGGERDELAYABS'], 0.0);
 display([' - changed camera delay back']);
 pause(1)
 
@@ -198,7 +199,7 @@ for ii = 1:num_actuator % scan points
         ddd_read                = doocsread([addr_cam, 'SPECTRUM.X.TD']);
         raw_spec_x(ii,jj,:)     = ddd_read.data.d_gspect_array_val;
         % compared it with last measurement
-        datatimestamp(jj)         = ddd_read.timespamp;
+        datatimestamp(jj)         = ddd_read.timestamp;
         % compared it with last measurement
         if jj > 1
             while datatimestamp(jj) == datatimestamp(jj-1)
@@ -225,7 +226,7 @@ for ii = 1:num_actuator % scan points
         %%% read spectrum Y
         ddd_read                = doocsread([addr_cam, 'SPECTRUM.Y.TD']);
         raw_spec_y(ii,jj,:)     = ddd_read.data.d_gspect_array_val;
-        datatimestamp2(jj)         = ddd_read.timespamp;
+        datatimestamp2(jj)         = ddd_read.timestamp;
         % compared it with last measurement
         if jj > 1
             while datatimestamp2(jj) == datatimestamp2(jj-1)
@@ -366,4 +367,4 @@ uicontrol('String', 'Print', 'Callback', @(btn,~)printButtonCallbackDFS(btn, 'FL
 %% change the foulder ------
 save([datafile_timecollibration, 'time_calib_9FL2XTDS', '_', timestamp, '.mat'])
 save(temp_file, 'amplitude_XTDS', 'timecal_fspixel', 'timecal_fspixel_err',...
-    'timecal_streak', 'time_res', 'timestamp'
+    'timecal_streak', 'time_res', 'timestamp')

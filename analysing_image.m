@@ -4,6 +4,7 @@
 % Najmeh Mirian, DESY, 29, Nov, 2023
 
 function output_filename= analysing_image(filename, a)
+close all
 imag_file=load(filename);
 load('/home/ttflinac/user/mflorian/PolariX/FL2/time_calibration/time_calib_9FL2XTDS.mat', 'timecal_fspixel', ...
     'timecal_fspixel_err', 'timecal_streak', 'time_res');
@@ -56,7 +57,7 @@ for jj = 1:num_sig
     [x_com(jj), x_var(jj), x_fwhm(jj), x_axis, x_profile(jj,:)]  = get_profile_stats(tmp_profile, calib_x);
 
     % erg
-    tmp_profile         = mean(tmp_img, 2);
+    tmp_profile         = mean(img_filt(:,:,jj), 2);
     %     tmp_profile         = medfilt1(tmp_profile, 1);
     [y_com(jj), y_var(jj), y_fwhm(jj), y_axis, y_profile(jj,:)]  = get_profile_stats(tmp_profile', calib_y);
 
@@ -73,7 +74,7 @@ slice_enrgy_spread=zeros(num_sig, length_x);
 %%
 % energy spread calcaultion
 for jj=1:num_sig
-    for n=min(time_pos_good):max(time_pos_good)
+    parfor n=min(time_pos_good):max(time_pos_good)
 
 
         Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
@@ -96,6 +97,9 @@ for jj=1: num_sig
 
 end
 
+
+
+%%
 figure(10012)
 set(gcf, 'Position', [800, 1, 1500, 1600])
 
@@ -111,7 +115,7 @@ lim_y = get(gca, 'YLim'); lim_x = get(gca, 'XLim');
 
 subplot(2,2,2)
 p1 = plot( time_axis(time_pos_good)-mean(time_axis(time_pos_good),'omitnan'),...
-    smoothdata(cent_energy_cr(end,time_pos_good)));
+    cent_energy_cr(end,time_pos_good)-mean(cent_energy_cr(end,time_pos_good)));
 grid on
 title('energy deviation' ,'FontSize', fontSize)
 xlabel('norm. erg density', 'FontSize', fontSize)
@@ -138,7 +142,7 @@ legend([p1], {['rms: ' num2str(x_var(end), '%5.2f'), ' fs', 10, ...
     'Location','northoutside','FontSize', fontSize-2)
 yyaxis right
 
-p2 = plot(time_axis(time_pos_good)-mean(time_axis(time_pos_good),'omitnan'), smoothdata(slice_enrgy_spread(end,time_pos_good)))
+p2 = plot(time_axis(time_pos_good)-mean(time_axis(time_pos_good),'omitnan'), slice_enrgy_spread(end,time_pos_good))
 
 
 %slice_enrgy_spread(:,time_pos_good)
@@ -178,6 +182,13 @@ legend([p1(1), p2(1), p3(1)], {['rms bu length, mean: ', num2str(mean(x_var), '%
     'Location','northoutside', 'FontSize', fontSize-2)
 
 set(gca, 'FontSize', fontSize)
+%% MBI 
+% if num_sig==1
+%    subplot(2,2,4)
+% FFT2d=abs(fftshift( fft2(flipud(tmp2_img(time_pos_good,erg_pos_good)'))));
+% h=pcolor(FFT2d);
+% set(h, 'EdgeColor', 'none');
+% end 
 t=date;
 Year=year(t);
 fulder_add=['/home/ttflinac/data/PolariX/', num2str(Year), '/'];

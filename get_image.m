@@ -1,7 +1,7 @@
 function sigma_x = get_image( num_sig, addr_cam )
 %% take image from abr. beam camera in FLF
 
-
+num_bgr=10;
 % clear all
 % close all
 
