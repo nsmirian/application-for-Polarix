@@ -112,7 +112,7 @@ scan_list_rbv       = zeros(num_actuator, num_sig);
 
 %% take background
 
-ddd_write = doocswrite([addr_cam, 'TRIGGERDELAYABS'], 10000);
+ddd_write = doocswrite([addr_cam, 'TRIGGERDELAYABS'], 1000);
 display(' - changed camera delay');
 pause(2)
 
