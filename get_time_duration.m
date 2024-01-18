@@ -1,6 +1,6 @@
 
 
-function get_time_duration(firstphase, secondphase)
+function filename=get_time_duration(firstphase, secondphase)
 addr_TDSphase='FLASH.RF/LLRF.CONTROLLER/CTRL.POLARIX/SP.PHASE';
 % adress of onbeam =======>
 addr_onbeam='FLASH.DIAG/TIMINGINFO/FLFXTDS/ON_BEAM';
@@ -17,7 +17,7 @@ fontSize        = 14;
 calib_x             = timecal_fspixel;
 calib_y             = ergcal;
 timeres_calib       = time_res;
-
+   a=1
 phase(1)= firstphase;
 phase(3)=secondphase;
 phase(2)=0.0
@@ -33,7 +33,6 @@ for i=1:2:3
         img_sig(:,:,jj)     = ddd_read.data.val_val;
 
         ts(jj)=ddd_read.timestamp;
-        %charge(jj)=doocsread(addr_charge);
 
         % compared it with last measurement
         if jj > 1
@@ -45,11 +44,9 @@ for i=1:2:3
                 pause(0.1)
             end
         end
-         img = squeeze(mean(img_sig, 3));
-    a=1
-   [ length_y, length_x]=size(img );
-    %y_axis, y_axis= collibrataxis(length_y, length_x)
-    imag=hlc_clean_image( squeeze(img(a:end,:)));
+        
+ 
+    imag=hlc_clean_image( squeeze(img_sig(a:end,:,jj)));
 
     % time
     tmp_profile         = mean(imag);
@@ -57,24 +54,10 @@ for i=1:2:3
  pause(0.11)
 
     end
+  image(i)=squeeze(mean(img_sig, 3)); % average of image 
 
-
-    %img_mean = squeeze(mean(img_sig, 3));
-
-    %%%
-
-    % ccharge_7FL2XTDS=,
-
-%     a=1
-%    [ length_y, length_x]=size(img_mean );
-    %y_axis, y_axis= collibrataxis(length_y, length_x)
-%     imag=hlc_clean_image( squeeze(img_mean(a:end,:)));
-% 
-%     % time
-%     tmp_profile         = mean(imag);
-%     [x_com(i), x_var(i), x_fwhm(i), x_axis, x_profile] = get_profile_stats(tmp_profile, timecal_fspixel);
 end
-
+%%
 i=2;
 tem=doocswrite(addr_onbeam,0)
 display(' phase was set')
@@ -84,9 +67,8 @@ display(' phase was set')
 for jj=1:nshot
     ddd_read            = doocsread([addr_cam, 'IMAGE_EXT_ZMQ']);
     img_sig(:,:,jj)     = ddd_read.data.val_val;
-
     ts(jj)=ddd_read.timestamp;
- %   charge(jj)=doocsread(addr_charge);
+
 
     % compared it with last measurement
     if jj > 1
@@ -97,11 +79,7 @@ for jj=1:nshot
             display( [' - (', num2str(jj), ') same data ... wait ...']);
             pause(0.1)
         end
-            img = squeeze(mean(img_sig, 3));
-    a=1
-   [ length_y, length_x]=size(img );
-    %y_axis, y_axis= collibrataxis(length_y, length_x)
-    imag=hlc_clean_image( squeeze(img(a:end,:)));
+    imag=hlc_clean_image( squeeze(img_sig(a:end,:,jj)));
 
     % time
     tmp_profile         = mean(imag);
@@ -109,26 +87,10 @@ for jj=1:nshot
  pause(0.11)
 
     end
-
+ image(i)=squeeze(mean(img_sig, 3)); % average of image 
     pause(0.1)
 
 end
-% tem=doocswrite(addr_onbeam,1)
-% 
-% img_mean = squeeze(mean(img_sig, 3));
-
-%%%
-
-% ccharge_7FL2XTDS=,
-
-
-% [length_y, length_x]=size(img_sig);
-% %y_axis, y_axis= collibrataxis(length_y, length_x)
-% imag=hlc_clean_image( squeeze(img_sig(a:end,:)));
-% 
-% % time
-%  tmp_profile         = mean(imag);
-%     [x_com(i), x_var(i), x_fwhm(i), x_axis, x_profile]  = get_profile_stats(tmp_profile, timecal_fspixel);
 %%
 errotr_value=std(x_var, 2);
 mean_value=mean(x_var, 2);
@@ -141,4 +103,10 @@ errorbar(volt,mean_value,errotr_value, '-.o', "MarkerSize",10,...
 xlim([-1.2 1.2])
 xticks([-1, 0, 1])
 xticklabels({'-v','0','v'})
-
+%%
+t=date;
+Year=year(t);
+fulder_add=['/home/ttflinac/data/PolariX/', num2str(Year), '/'];
+timestamp       = datestr(clock, 'yyyy-mm-ddTHHMMSS');
+save([fulder_add, timestamp, '.mat'],'timestamp' ,  'x_var', 'x_fwhm','image',  'timecal_fspixel')
+output_filename=[fulder_add, timestamp, '.mat']
