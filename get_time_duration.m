@@ -95,14 +95,18 @@ end
 errotr_value=std(x_var, 2);
 mean_value=mean(x_var, 2);
 %%
-volt=[-1,0, 1]
+S=[-1,0, 1]
 
 figure(122321)
-errorbar(volt,mean_value,errotr_value, '-.o', "MarkerSize",10,...
+errorbar(S,mean_value,errotr_value, 'o', "MarkerSize",10,...
     "MarkerEdgeColor",'m',"MarkerFaceColor",'b', 'LineWidth',3)
 xlim([-1.2 1.2])
 xticks([-1, 0, 1])
-xticklabels({'-v','0','v'})
+xticklabels({'-S','0','S'})
+xlable('S_y')
+ylable('\sigma(fs)')
+%%
+p = polyfit(S,mean_value.^2,2)
 %%
 t=date;
 Year=year(t);
