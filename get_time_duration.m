@@ -129,12 +129,15 @@ end
 % % time
 %  tmp_profile         = mean(imag);
 %     [x_com(i), x_var(i), x_fwhm(i), x_axis, x_profile]  = get_profile_stats(tmp_profile, timecal_fspixel);
-
+%%
+errotr_value=std(x_var, 2);
+mean_value=mean(x_var, 2);
 %%
 volt=[-1,0, 1]
 
 figure(122321)
-plot(volt,x_fwhm, '-.o')
+errorbar(volt,mean_value,errotr_value, '-.o', "MarkerSize",10,...
+    "MarkerEdgeColor",'m',"MarkerFaceColor",'b', 'LineWidth',3)
 xlim([-1.2 1.2])
 xticks([-1, 0, 1])
 xticklabels({'-v','0','v'})
