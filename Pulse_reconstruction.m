@@ -44,8 +44,7 @@ for on_off=0:3:3
         text='lasing on'
     else
         img_sig=imag_lasing_off.img(a:end, :, :);
-        %         charge_7FL2XTDS_mean=mean(imag_lasing_off.charge)  ; %V check it
-        %         charge_7FL2XTDS=imag_lasing_off.charge;
+        num_sig     = size(img_sig, 3);
         for i=1:num_sig, charge_7FL2XTDS(i)=imag_lasing_off.charge(i).data; end
         charge_7FL2XTDS_mean=mean(charge_7FL2XTDS)  ; %V check it
         text='lasing off'
@@ -68,7 +67,7 @@ for on_off=0:3:3
     y=1:length_y;
     x=1:length_x;
     %%
-    for jj = 1:num_sig
+    parfor jj = 1:num_sig
 
         tmp_img             = hlc_clean_image( squeeze(img_sig(:,:,jj)) );
         %tmp_img             = get_ROI(squeeze(img_sig(:,:,jj)) - img_bgr_mean);
@@ -99,7 +98,7 @@ for on_off=0:3:3
     %%
     %     figure; plot(slice_enrgy_spread_ave)
     %%
-    for jj=1:num_sig
+    parfor jj=1:num_sig
         parfor n=min(time_pos_good):max(time_pos_good)
 
           %  mu0=  find( img_filt(erg_pos_good,n,jj)==max(img_filt(erg_pos_good,n,jj)));
