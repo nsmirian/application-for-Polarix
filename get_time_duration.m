@@ -98,12 +98,13 @@ mean_value=mean(x_var, 2);
 Sn=[-1,0, 1]
 %%
 p = polyfit(S,mean_value.^2,2)
-C=sqrt(p(1));
+C=sqrt(p(1)); B=p(2); a = sqrt(p(3));
 S=(abs(timecal_fspixel)); %!!![um/fs],average of shear parameter from two linear plots!!!
 sigma=C/S; % [fs],bunch length
+resolution=a/((abs(B)+1)*S); %!! measurement resolution
 %%
 figure(122321)
-errorbar(Sn,mean_value,errotr_value, 'o', "MarkerSize",10,...
+errorbar(Sn,mean_value.^2,errotr_value, 'o', "MarkerSize",10,...
     "MarkerEdgeColor",'m',"MarkerFaceColor",'b')
 
 %%
@@ -112,11 +113,16 @@ hold on
 plot(x1,y1, 'b', 'LineWidth',3 )
 hold off
 
+text(0.15,0.55,{'Fit Analysis:',['intrinsic spot size $\sigma_{x,i} = ' num2str(a,'%.2f') 'fs'],['correlation $C_x/|S_x| =...
+' num2str(b,'%.3g') '$'],['{\bf bunch length }$\sigma_t = ' num2str(c,'%.2f') '$' 'fs'], ['long. resolution $R_x = ...
+' num2str(resolution,'%.2f') '$' fs] },'units','normalized','fontsize',16,'interpreter','latex')
+grid on
 xlim([-1.2 1.2])
 xticks([-1, 0, 1])
 xticklabels({'-S','0','S'})
-xlable('S_y')
-ylable('\sigma(fs)')
+
+xlabel ('normalized streak $S/|S_x|$','interpreter','latex')
+ylabel ('spot size $\sigma_x [fs]$','interpreter','latex')
 %%
 t=date;
 Year=year(t);
