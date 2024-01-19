@@ -95,18 +95,28 @@ end
 errotr_value=std(x_var, 2);
 mean_value=mean(x_var, 2);
 %%
-S=[-1,0, 1]
-
+Sn=[-1,0, 1]
+%%
+p = polyfit(S,mean_value.^2,2)
+C=sqrt(p(1));
+S=(abs(timecal_fspixel)); %!!![um/fs],average of shear parameter from two linear plots!!!
+sigma=C/S; % [fs],bunch length
+%%
 figure(122321)
-errorbar(S,mean_value,errotr_value, 'o', "MarkerSize",10,...
-    "MarkerEdgeColor",'m',"MarkerFaceColor",'b', 'LineWidth',3)
+errorbar(Sn,mean_value,errotr_value, 'o', "MarkerSize",10,...
+    "MarkerEdgeColor",'m',"MarkerFaceColor",'b')
+
+%%
+x1 = linspace(-1.1,1.1,7); y1 = polyval(p,x1);
+hold on
+plot(x1,y1, 'b', 'LineWidth',3 )
+hold off
+
 xlim([-1.2 1.2])
 xticks([-1, 0, 1])
 xticklabels({'-S','0','S'})
 xlable('S_y')
 ylable('\sigma(fs)')
-%%
-p = polyfit(S,mean_value.^2,2)
 %%
 t=date;
 Year=year(t);
