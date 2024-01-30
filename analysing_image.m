@@ -105,7 +105,7 @@ set(gcf, 'Position', [800, 1, 1500, 1600])
 
 subplot(2,2,1)
 imagesc(time_axis(time_pos_good)-mean(time_axis(time_pos_good),'omitnan'),...
-    erg_axis(erg_pos_good), flipud(tmp2_img(time_pos_good,erg_pos_good)') )
+    erg_axis(erg_pos_good), flipud(tmp2_img(time_pos_good,erg_pos_good(end:-1:1))') )
 grid on
 title(['single image '], 'FontSize', fontSize, 'Interpreter', 'none')
 xlabel('time t /fs)', 'FontSize', fontSize)
@@ -195,4 +195,38 @@ fulder_add=['/home/ttflinac/data/PolariX/', num2str(Year), '/'];
 timestamp       = datestr(clock, 'yyyy-mm-ddTHHMMSS');
 save([fulder_add, timestamp, '.mat'],'timestamp' ,  'imag_file',  'slice_enrgy_spread', 'cent_energy_cr', 'x_var', 'x_fwhm', 'y_var','ergcal', 'timecal_fspixel')
 output_filename=[fulder_add, timestamp, '.mat']
+%% chirp 
+%im = imshow(image);
+try 
+ roi = drawrectangle(subplot(2,2,1));
+l(1)=roi.Position(1);
+ l(2)=roi.Position(3);
+             
+index1=find(time_axis=l(1))
+index2=find(time_axis=l(2))
+i=1;
+for n=index1 : index2
+
+   cent_energy(:,i)= cent_energy_cr(:, n);
+   time_de(i)=time_axis(i);
+   
+   i=i+1;
+   
+end 
+
+p = polyfit( time_de,cent_energy,3);
+y1 = polyval(p,time_de);
+
+
+figure ()
+p1=plot(time_de, cent_energy,'o', 'Color', 'm', 'MarkerSize', MarkerSizz)
+hold on
+p2=plot(time_de,y1, 'LineWidth', 2)
+legend([p1, p2], { 'data', ['fitting data', 'a=',num2str(p(1)), '%5.2f', 'Mev/fs^2' ) , ...
+'b=' ,num2str(p(2)), '%5.2f'), 'Mev/fs'  , 'c=', num2str(p(3)), 'Mev']})
+hold off
+
+end
+
+
 
