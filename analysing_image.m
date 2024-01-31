@@ -196,14 +196,17 @@ timestamp       = datestr(clock, 'yyyy-mm-ddTHHMMSS');
 save([fulder_add, timestamp, '.mat'],'timestamp' ,  'imag_file',  'slice_enrgy_spread', 'cent_energy_cr', 'x_var', 'x_fwhm', 'y_var','ergcal', 'timecal_fspixel')
 output_filename=[fulder_add, timestamp, '.mat']
 %% chirp 
+%% chirp 
 %im = imshow(image);
 try 
+ clear  time_de cent_energy
  roi = drawrectangle(subplot(2,2,1));
-l(1)=roi.Position(1);
- l(2)=roi.Position(3);
+l(1)=roi.Position(1)
+ l(2)=roi.Position(3)
              
-index1=find(time_axis=l(1))
-index2=find(time_axis=l(2))
+%index1=find(time_axis==l(1))
+[val,index1]=min(abs(time_axis-l(1)));
+[val,index2]=min(abs(time_axis-l(2)));
 i=1;
 for n=index1 : index2
 
@@ -219,14 +222,15 @@ y1 = polyval(p,time_de);
 
 
 figure ()
-p1=plot(time_de, cent_energy,'o', 'Color', 'm', 'MarkerSize', MarkerSizz)
+p1=plot(time_de, cent_energy,'o', 'Color', 'm', 'MarkerSize', 2)
 hold on
 p2=plot(time_de,y1, 'LineWidth', 2)
-legend([p1, p2], { 'data', ['fitting data', 'a=',num2str(p(1)), '%5.2f', 'Mev/fs^2' ) , ...
-'b=' ,num2str(p(2)), '%5.2f'), 'Mev/fs'  , 'c=', num2str(p(3)), 'Mev']})
+legend([p1, p2], { 'data', ['fitting data',10, ...
+    ' a=',num2str(p(1)), ' Mev/fs^2', 10  , ...
+'b=' ,num2str(p(2)),  'Mev/fs', 10 ...
+, ' c=', num2str(p(3)), 'Mev']})
 hold off
 
-end
-
+end 
 
 
