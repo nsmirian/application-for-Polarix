@@ -36,15 +36,17 @@ timeres_calib       = time_res;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for on_off=0:3:3
     if on_off==0
-        img_sig=imag_lasing_on.img(a:end, :, :);
+        img_sig=imag_lasing_on.img(end:a, :, :);
         num_sig     = size(img_sig, 3);
         for i=1:num_sig, charge_7FL2XTDS(i)=imag_lasing_on.charge(i).data; end
         charge_7FL2XTDS_mean=mean(charge_7FL2XTDS)  ; %V check it
 
         text='lasing on'
     else
-        img_sig=imag_lasing_off.img(a:end, :, :);
-        num_sig     = size(img_sig, 3);
+        img_sig=imag_lasing_off.img(end:a, :, :);
+         num_sig     = size(img_sig, 3);
+        %         charge_7FL2XTDS_mean=mean(imag_lasing_off.charge)  ; %V check it
+        %         charge_7FL2XTDS=imag_lasing_off.charge;
         for i=1:num_sig, charge_7FL2XTDS(i)=imag_lasing_off.charge(i).data; end
         charge_7FL2XTDS_mean=mean(charge_7FL2XTDS)  ; %V check it
         text='lasing off'
@@ -65,9 +67,8 @@ for on_off=0:3:3
     x_fwhm      = zeros([1, num_sig]);              y_fwhm      = zeros([1, num_sig]);
     x_profile   = zeros([num_sig, length_x]);       y_profile   = zeros([num_sig, length_y]);
     y=1:length_y;
-    x=1:length_x;
     %%
-    parfor jj = 1:num_sig
+    for jj = 1:num_sig
 
         tmp_img             = hlc_clean_image( squeeze(img_sig(:,:,jj)) );
         %tmp_img             = get_ROI(squeeze(img_sig(:,:,jj)) - img_bgr_mean);
@@ -98,12 +99,12 @@ for on_off=0:3:3
     %%
     %     figure; plot(slice_enrgy_spread_ave)
     %%
-    parfor jj=1:num_sig
-        parfor n=min(time_pos_good):max(time_pos_good)
+    for jj=1:num_sig
+        for n=min(time_pos_good):max(time_pos_good)
 
           %  mu0=  find( img_filt(erg_pos_good,n,jj)==max(img_filt(erg_pos_good,n,jj)));
           %  [sigma, mu] = gaussfit( erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) , 0, erg_pos_good(mu0(1)));
-           Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
+          Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
         %Ans=[baseline, height,mu, sigma]
         if isnan(Ans(3))
         else
@@ -112,24 +113,13 @@ for on_off=0:3:3
             cent_energy_cr(jj, n)=Ans(3)*calib_y;
         end
 
-    end
-          
-%           
-%           [baseline, height,sigma, mu]=hlc_fit_gaussian(x, y);
-%           if isnan(sigma)
-%             else
-% 
-%                 slice_enrgy_spread(jj, n)=sigma*calib_y;
-%                 cent_energy_cr(jj, n)=mu*calib_y;
-%             end
-% 
-%         end
+        end
     end
 
 
     %% jetting of stabilitty correction
     for jj=1: num_sig
-        ftemp=find(smoothdata(x_profile(jj,:))==max(smoothdata(x_profile(jj,:))));
+        ftemp=find(x_profile(jj,:)==max(x_profile(jj,:)));
         mass_center(jj)=ftemp(1);
 
     end
@@ -287,11 +277,11 @@ mass_center_off=find(imag_lasing_off.aver.current==max(imag_lasing_off.aver.curr
 
 power=zeros( length_x,1);
 
-power= -imag_lasing_off.aver.central_energy(time_pos_good).* imag_lasing_off.aver.current(time_pos_good)  ...
-       + imag_lasing_on.aver.central_energy(time_pos_good-mass_center_off+mass_center_on).* imag_lasing_on.aver.current(time_pos_good-mass_center_off+mass_center_on);
-% power=-aver_central_energy_lasingoff(time_pos_good).* aver_current_lasingoff(time_pos_good) - ...
+power= imag_lasing_off.aver.central_energy(time_pos_good).* imag_lasing_off.aver.current(time_pos_good) - ...
+    imag_lasing_on.aver.central_energy(time_pos_good-mass_center_off+mass_center_on).* imag_lasing_on.aver.current(time_pos_good-mass_center_off+mass_center_on);
+% power=aver_central_energy_lasingoff(time_pos_good).* aver_current_lasingoff(time_pos_good) - ...
 %         aver_central_energy_lasingon(time_pos_good).* aver_current_lasingoff(time_pos_good);
-power2=(-imag_lasing_off.aver.central_energy(time_pos_good)+ ...
+power2=(imag_lasing_off.aver.central_energy(time_pos_good)- ...
     imag_lasing_on.aver.central_energy(time_pos_good-mass_center_off+mass_center_on)).* imag_lasing_on.aver.current(time_pos_good-mass_center_off+mass_center_on);
 %% save
 timeCallib=load('/home/ttflinac/user/mflorian/PolariX/FL2/time_calibration/time_calib_9FL2XTDS.mat');
@@ -300,7 +290,7 @@ t=date;
 Year=year(t);
 fulder_add=['/home/ttflinac/data/PolariX/', num2str(Year), '/'];
 timestamp       = datestr(clock, 'yyyy-mm-ddTHHMMSS');
-save([fulder_add, timestamp, '.mat'],'timestamp' ,   'imag_lasing_on', 'imag_lasing_off','energyCalib', 'timeCallib', 'power')
+save([fulder_add, timestamp, '.mat'],'timestamp' ,  'img_bgr_mean',  'imag_lasing_on', 'imag_lasing_off','energyCalib', 'timeCallib', 'power')
 
 display(' - data saved');
 %%%%%%%%%%%%%%%%%%%%%
