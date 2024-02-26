@@ -1,4 +1,4 @@
-function lasing_phase_spce_analysing(filename,a )
+function get_off_lasing_data(filename,a )
 
 imag_lasing_off=load(filename);
 % calibration data
