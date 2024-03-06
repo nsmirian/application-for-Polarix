@@ -19,12 +19,12 @@ calib_y             = ergcal;
 timeres_calib       = time_res;
 
 
-if a <600
+if a <200
 
 img_sig    = imag_file.img(1:end, :, :);
 
 else 
-    img_sig    = imag_file.img(1:a, :, :);
+    img_sig    = imag_file.img(a:end, :, :);
 end 
 
 num_sig     = size(img_sig, 3);
@@ -45,7 +45,7 @@ charge_7FL2XTDS_mean=mean(charge_7FL2XTDS)  ; %V check it
 tmp2_img=squeeze(transpose(img_sig(:,:,end)));
 %
 %%
-for jj = 1:num_sig
+parfor jj = 1:num_sig
 
     tmp_img             = hlc_clean_image( squeeze(img_sig(:,:,jj)) );
 
@@ -79,12 +79,15 @@ for jj=1:num_sig
 
         Ans=hlc_fit_gaussian(erg_pos_good, smoothdata(img_filt(erg_pos_good,n,jj)) );
         %Ans=[baseline, height,mu, sigma]
-        if isnan(Ans(3))
+        if Ans(4)>100
         else
 
             slice_enrgy_spread(jj, n)=Ans(4)*calib_y;
             cent_energy_cr(jj, n)=Ans(3)*calib_y;
         end
+%         if slice_energy_spread(jj, n)> 100
+%                         slice_energy_spread(jj, n)=0
+%                     end
 
     end
 end
@@ -193,7 +196,10 @@ t=date;
 Year=year(t);
 fulder_add=['/home/ttflinac/data/PolariX/', num2str(Year), '/'];
 timestamp       = datestr(clock, 'yyyy-mm-ddTHHMMSS');
-save([fulder_add, timestamp, '.mat'],'timestamp' ,  'imag_file',  'slice_enrgy_spread', 'cent_energy_cr', 'x_var', 'x_fwhm', 'y_var','ergcal', 'timecal_fspixel')
+current=1e-3*charge_7FL2XTDS_mean*1e-9*1e15 * x_profile;
+save([fulder_add, timestamp, '.mat'],'timestamp' ,  'imag_file',  'slice_enrgy_spread',...
+    'cent_energy_cr', 'x_var', 'x_fwhm', 'y_var','ergcal', 'timecal_fspixel','time_pos_good',...
+    'current')
 output_filename=[fulder_add, timestamp, '.mat']
 %% chirp 
 %% chirp 
@@ -210,7 +216,7 @@ l(1)=roi.Position(1)
 i=1;
 for n=index1 : index2
 
-   cent_energy(:,i)= cent_energy_cr(:, n);
+   cent_energy(:,i)= mean(cent_energy_cr(:, n));
    time_de(i)=time_axis(i);
    
    i=i+1;
