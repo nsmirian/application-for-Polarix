@@ -205,24 +205,15 @@ output_filename=[fulder_add, timestamp, '.mat']
 %% chirp 
 %im = imshow(image);
 try 
- clear  time_de cent_energy
- roi = drawrectangle(subplot(2,2,1));
-l(1)=roi.Position(1)
- l(2)=roi.Position(3)
-             
-%index1=find(time_axis==l(1))
-[val,index1]=min(abs(time_axis-l(1)));
-[val,index2]=min(abs(time_axis-l(2)));
-i=1;
-for n=index1 : index2
 
-   cent_energy(:,i)= mean(cent_energy_cr(:, n));
-   time_de(i)=time_axis(i);
-   
-   i=i+1;
+parfor n=min(time_pos_good):max(time_pos_good)
+%for n=index1 : index2
+
+   cent_energy(n)= mean(cent_energy_cr(:, n));
+   %time_de(i)=time_axis(i);
    
 end 
-
+time_de=time_axis(time_pos_good)-mean(time_axis(time_pos_good),'omitnan')
 p = polyfit( time_de,cent_energy,3);
 y1 = polyval(p,time_de);
 
