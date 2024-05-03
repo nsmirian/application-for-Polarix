@@ -1,4 +1,4 @@
-
+function adjustingTDSFAST()
 clear all
 clc
 %function adjusting_TDS%(delat_pahse)
@@ -14,16 +14,16 @@ ddr_cam        = 'FLASH.DIAG/CAMERA/OTR9FL2XTDS/';
     addr_amp='FLASH.RF/LLRF.CONTROLLER/CTRL.POLARIX/SP.AMPL';
     phase_XTDS=getfield(doocsread(add_phase), 'data');
 x1=getfield(doocsread(add_COFM), 'data')
-tem=doocswrite(add_phase, phase_XTDS+0.5);
+tem=doocswrite(add_phase, phase_XTDS+2);
 pause(0.2)
 x2=getfield(doocsread(add_COFM), 'data')
-%%
+
 if x2-x1 >0
     phase_feed=0.5 ;% or -1
 elseif x2-x1 <0
     phase_feed=-0.5;
 end
-%%
+
 %%%%%%%%
 addr_TDS_amp=addr_amp;
 tem=doocswrite(add_phase, phase_XTDS)
@@ -34,12 +34,12 @@ for A1=A0_TDS:2:72
     tem=doocswrite(addr_TDS_amp, A1);
     pause(0.2)
     x2=getfield(doocsread(add_COFM), 'data');
-    if x2>x0
-    while x2>x0
-     phase=getfield(doocsread(addr_TDSphase), 'data')
-    tem=doocswrite(add_phase, phase+phase_feed);
-    pause(0.5)
-    x2=getfield(doocsread(add_COFM), 'data');
+ %   if x2>x0
+%     while x2>x0
+%      phase=getfield(doocsread(addr_TDSphase), 'data')
+%     tem=doocswrite(add_phase, phase+phase_feed);
+%     pause(0.5)
+%     x2=getfield(doocsread(add_COFM), 'data');
     if x2>11
         phase_feed=-phase_feed
         while x2>11
@@ -50,20 +50,20 @@ for A1=A0_TDS:2:72
     x2=getfield(doocsread(add_COFM), 'data');
         end
     end
-    end
-    end
+  %  end
+   % end
     
-    if x2<x0 
-    while x2<x0
+    if x2<3
+    while x2<3
         phase=getfield(doocsread(addr_TDSphase), 'data')
     tem=doocswrite(add_phase, phase_feed+phase);
     pause(0.5)
     x2=getfield(doocsread(add_COFM), 'data');
-    if x2<2
-        phase_feed=-phase_feed
+    %if x2<2
+     %   phase_feed=-phase_feed
     end
     end
-    end
+   % end
     
     
     
